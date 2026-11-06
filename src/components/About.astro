@@ -1,0 +1,96 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from './SectionHead.astro';
+import headshot from '../assets/headshot.png';
+import { certifications, experience, profile } from '../data/profile';
+---
+
+<section id="about" class="section w-prose" aria-labelledby="about-title">
+  <SectionHead path="/about" title="About" id="about-title" />
+  <div class="about">
+    <Image src={headshot} alt={`Portrait of ${profile.name}`} width={128} height={128} densities={[1, 2]} class="portrait" />
+    <div class="text">
+      {profile.about.map((p) => <p>{p}</p>)}
+      <p class="certs meta">
+        {certifications.map((c, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true"> · </span>}
+            <a href={c.url} title={c.name}>{c.code} ↗</a>
+          </>
+        ))}
+      </p>
+      <details class="skills" open>
+        <summary class="meta">Experience</summary>
+        <ul class="meta">
+          {experience.map((e) => <li><strong>{e.role}</strong> · {e.org} · {e.period}</li>)}
+        </ul>
+      </details>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  .about :global(.portrait) {
+    width: 128px;
+    height: 128px;
+    object-fit: cover;
+    /* The source photo is already a circle on white; a square crop shows the corners. */
+    border-radius: 50%;
+    outline: 1px solid var(--line-strong);
+    outline-offset: 4px;
+  }
+
+  .text {
+    display: grid;
+    gap: 14px;
+  }
+
+  .certs {
+    color: var(--fg-2);
+  }
+
+  .certs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+
+  .skills summary {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--fg-2);
+  }
+
+  .skills summary:hover {
+    color: var(--fg);
+  }
+
+  .skills ul {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  @media (max-width: 560px) {
+    .about {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .about :global(.portrait) {
+      width: 96px;
+      height: 96px;
+    }
+  }
+</style>

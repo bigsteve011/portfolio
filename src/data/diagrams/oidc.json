@@ -1,0 +1,103 @@
+{
+  "id": "oidc",
+  "title": "Zero-trust CI/CD architecture",
+  "summary": "The runner never holds a cloud key. It exchanges a GitHub OIDC token for 15-minute credentials, and only images that are scanned, given an SBOM and signed with Cosign are deployed.",
+  "components": [
+    {
+      "id": "dev",
+      "name": "Developer",
+      "kind": "client",
+      "tech": "push / tag",
+      "col": 0,
+      "row": 1
+    },
+    {
+      "id": "gha",
+      "name": "GitHub Actions",
+      "kind": "ci",
+      "tech": "secure-deploy.yml",
+      "col": 1,
+      "row": 1,
+      "note": "IaC scan \u2192 build \u2192 SBOM \u2192 Cosign keyless sign and attest \u2192 verify \u2192 deploy."
+    },
+    {
+      "id": "tok",
+      "name": "GitHub OIDC issuer",
+      "kind": "external",
+      "tech": "token.actions.githubusercontent.com",
+      "col": 1,
+      "row": 0
+    },
+    {
+      "id": "sts",
+      "name": "AWS STS / Entra ID",
+      "kind": "secret-store",
+      "tech": "trust: exact repo + environment",
+      "col": 2,
+      "row": 0,
+      "note": "The federated trust policy matches the repository and the protected production environment; anything else is refused."
+    },
+    {
+      "id": "reg",
+      "name": "GHCR + Sigstore",
+      "kind": "datastore",
+      "tech": "signed digest \u00b7 CycloneDX SBOM",
+      "col": 2,
+      "row": 2
+    },
+    {
+      "id": "cloud",
+      "name": "Cloud target",
+      "kind": "service",
+      "tech": "least-privilege deployer role",
+      "col": 3,
+      "row": 1
+    }
+  ],
+  "flows": [
+    {
+      "from": "dev",
+      "to": "gha",
+      "label": "commit",
+      "type": "control"
+    },
+    {
+      "from": "gha",
+      "to": "tok",
+      "label": "request JWT",
+      "type": "control"
+    },
+    {
+      "from": "gha",
+      "to": "sts",
+      "label": "exchange JWT",
+      "type": "control"
+    },
+    {
+      "from": "sts",
+      "to": "gha",
+      "label": "15-min credentials",
+      "type": "control"
+    },
+    {
+      "from": "gha",
+      "to": "reg",
+      "label": "push signed image",
+      "type": "data"
+    },
+    {
+      "from": "gha",
+      "to": "cloud",
+      "label": "deploy after verify",
+      "type": "control"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "Protected production environment",
+      "contains": [
+        "gha"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": "landingzone",
+  "title": "Azure landing zone architecture",
+  "summary": "Workload spokes have no direct Internet path: every packet is forced through Azure Firewall Premium in the hub. PaaS services are reachable only through private endpoints, and Azure Policy denies anything that drifts.",
+  "components": [
+    {
+      "id": "user",
+      "name": "Users / on-prem",
+      "kind": "client",
+      "tech": "ExpressRoute \u00b7 VPN",
+      "col": 0,
+      "row": 1
+    },
+    {
+      "id": "gw",
+      "name": "GatewaySubnet",
+      "kind": "edge",
+      "tech": "hybrid connectivity",
+      "col": 1,
+      "row": 0
+    },
+    {
+      "id": "fw",
+      "name": "Azure Firewall Premium",
+      "kind": "edge",
+      "tech": "TLS inspection \u00b7 IDPS \u00b7 threat intel",
+      "col": 1,
+      "row": 1,
+      "note": "Threat intelligence and IDPS run in Deny mode; outbound traffic is limited to an FQDN allow-list."
+    },
+    {
+      "id": "app",
+      "name": "Workload spoke",
+      "kind": "service",
+      "tech": "UDR 0.0.0.0/0 \u2192 firewall",
+      "col": 2,
+      "row": 1,
+      "note": "A user-defined route sends all spoke traffic, including Internet egress, to the firewall private IP."
+    },
+    {
+      "id": "pe",
+      "name": "Private endpoints",
+      "kind": "datastore",
+      "tech": "Storage \u00b7 Key Vault \u00b7 SQL",
+      "col": 3,
+      "row": 1,
+      "note": "Public network access disabled; names resolve through Private DNS zones."
+    },
+    {
+      "id": "policy",
+      "name": "Azure Policy initiative",
+      "kind": "ci",
+      "tech": "Deny public / unencrypted / unapproved region",
+      "col": 2,
+      "row": 0,
+      "note": "Custom definitions grouped in an initiative and assigned at subscription scope."
+    },
+    {
+      "id": "mg",
+      "name": "Management groups",
+      "kind": "service",
+      "tech": "platform \u00b7 landing zones",
+      "col": 3,
+      "row": 0
+    }
+  ],
+  "flows": [
+    {
+      "from": "user",
+      "to": "gw",
+      "label": "private connectivity",
+      "type": "data"
+    },
+    {
+      "from": "gw",
+      "to": "fw",
+      "label": "inspected",
+      "type": "data"
+    },
+    {
+      "from": "app",
+      "to": "fw",
+      "label": "all egress (forced tunnelling)",
+      "type": "data"
+    },
+    {
+      "from": "app",
+      "to": "pe",
+      "label": "private IP only",
+      "type": "data"
+    },
+    {
+      "from": "policy",
+      "to": "app",
+      "label": "deny on drift",
+      "type": "control"
+    },
+    {
+      "from": "mg",
+      "to": "policy",
+      "label": "assignment scope",
+      "type": "control"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "Hub VNet",
+      "contains": [
+        "gw",
+        "fw"
+      ]
+    },
+    {
+      "name": "Spoke VNet",
+      "contains": [
+        "app",
+        "pe"
+      ]
+    }
+  ]
+}

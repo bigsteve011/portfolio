@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Privacy — Stephen Omowumi" description="What this site do with data.">
+  <section class="container privacy">
+    <p class="eyebrow">Privacy</p>
+    <h1>Privacy</h1>
+    <p class="meta">Last updated 5 October 2026</p>
+
+    <h2>This website</h2>
+    <p>
+      stephen-omowumi.pages.dev sets no cookies and runs no analytics, advertising or third-party scripts. Its only
+      network request after loading is to its own <code>/status.json</code>, to show the live status line.
+    </p>
+    <p>
+      The site is hosted on Cloudflare Pages. Cloudflare processes standard connection data, such as IP addresses,
+      to deliver and protect the site, under{' '}
+      <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>.
+    </p>
+
+    <h2>Contact</h2>
+    <p><a href="mailto:stephen.omowumi10@gmail.com">stephen.omowumi10@gmail.com</a></p>
+  </section>
+</Base>
+
+<style>
+  .privacy {
+    display: grid;
+    gap: 16px;
+    max-width: var(--prose);
+    padding-block: var(--section-gap);
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
+    font-weight: 600;
+  }
+
+  h2 {
+    margin-top: 24px;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  ul {
+    display: grid;
+    gap: 10px;
+    padding-left: 1.2rem;
+  }
+</style>

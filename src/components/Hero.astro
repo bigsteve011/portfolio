@@ -1,0 +1,114 @@
+---
+import Topology from './Topology.astro';
+import { data } from '../data/site-data';
+import { profile } from '../data/profile';
+import { isDevBuild, siteDiagram, statusRows } from '../lib/site-diagram';
+
+const healthy = statusRows.filter((r) => r.state === 'ok').length;
+---
+
+<section class="hero" aria-labelledby="hero-title" data-site-status={data.build.sha ?? ''}>
+  <div class="intro">
+    <h1 id="hero-title">{profile.name}</h1>
+    <p class="lead statement">{profile.statement}</p>
+    <ul class="meta tags" aria-label="Location and platforms">{profile.meta.split(' · ').map((m) => <li>{m}</li>)}</ul>
+    <p class="howto"><a class="link-accent" href="/work/this-site/">→ read how this site runs</a></p>
+  </div>
+
+  <div class="system">
+    <div class="system-head">
+      <span class="meta">{isDevBuild ? <span class="dev">DEV BUILD</span> : 'live'} · this site's pipeline</span>
+      <p class="meta status-line" role="status" aria-atomic="true">
+        <span>{healthy}/{statusRows.length} sources healthy</span>
+        {' · '}built <time datetime={data.build.at} data-relative>{data.build.at.slice(0, 10)}</time>
+        {' · '}<span data-status-edge>edge checking…</span>
+      </p>
+    </div>
+    <Topology
+      diagram={siteDiagram}
+      scale={{ nodeW: 156, nodeH: 60, colGap: 36, rowGap: 20, pad: 8, top: 4 }}
+      inspector={false}
+      tableLabel="View as table"
+    />
+  </div>
+</section>
+
+<script src="/js/control-plane.js" defer is:inline></script>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 48px;
+    align-items: center;
+    padding-top: 96px;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 1.6rem + 3.2vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+  .statement {
+    margin-top: 24px;
+    max-width: 34ch;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .tags li {
+    white-space: nowrap;
+  }
+
+  .howto {
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+  }
+
+  .howto a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .system {
+    min-width: 0;
+  }
+
+  .system-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin-bottom: 12px;
+  }
+
+  .dev {
+    color: var(--warn);
+  }
+
+  .status-line {
+    color: var(--fg-2);
+  }
+
+  .system :global(.topo-caption) {
+    display: none;
+  }
+
+  @media (max-width: 1023px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding-top: 64px;
+    }
+  }
+</style>

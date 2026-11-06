@@ -1,0 +1,85 @@
+---
+import Mark from './Mark.astro';
+import { profile } from '../data/profile';
+
+const nav = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#elsewhere', label: 'Contact' },
+];
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a class="brand" href="/" aria-label={`${profile.name}, home`}>
+      <Mark />
+      <span>{profile.name}</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul>
+        {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(11 17 32 / 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 64px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    text-decoration: none;
+    color: var(--fg);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 15px;
+    color: var(--fg-muted);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--fg);
+  }
+
+  @media (max-width: 400px) {
+    .brand span {
+      font-size: 15px;
+    }
+
+    nav a {
+      padding: 0 8px;
+    }
+  }
+</style>

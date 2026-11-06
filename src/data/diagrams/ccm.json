@@ -1,0 +1,103 @@
+{
+  "id": "ccm",
+  "title": "Continuous control monitoring engine",
+  "summary": "System exports are tested against fifteen unified controls. Results roll up to ISO 27001, NIST CSF 2.0, SOC 2, PCI DSS 4.0 and DORA with a weakest-link rule, and come out as a report and JSON.",
+  "components": [
+    {
+      "id": "idp",
+      "name": "IdP / HR exports",
+      "kind": "external",
+      "tech": "users \u00b7 leavers \u00b7 MFA",
+      "col": 0,
+      "row": 0
+    },
+    {
+      "id": "sec",
+      "name": "EDR \u00b7 scanner \u00b7 SIEM \u00b7 CSPM",
+      "kind": "external",
+      "tech": "coverage and findings",
+      "col": 0,
+      "row": 1
+    },
+    {
+      "id": "bkp",
+      "name": "Backup \u00b7 TPRM \u00b7 LMS",
+      "kind": "external",
+      "tech": "restores \u00b7 vendors \u00b7 training",
+      "col": 0,
+      "row": 2
+    },
+    {
+      "id": "lib",
+      "name": "Unified control library",
+      "kind": "datastore",
+      "tech": "15 controls \u00d7 5 frameworks",
+      "col": 1,
+      "row": 0
+    },
+    {
+      "id": "eng",
+      "name": "ccm_engine.py",
+      "kind": "job",
+      "tech": "stdlib only \u00b7 deterministic",
+      "col": 1,
+      "row": 1,
+      "note": "Tests the full population, not a sample. Approved risk acceptances are excluded from failures but listed."
+    },
+    {
+      "id": "out",
+      "name": "Report + JSON",
+      "kind": "service",
+      "tech": "Markdown \u00b7 ServiceNow IRM / Archer",
+      "col": 2,
+      "row": 1
+    },
+    {
+      "id": "risk",
+      "name": "Risk register",
+      "kind": "datastore",
+      "tech": "failures \u2192 risks with SLAs",
+      "col": 3,
+      "row": 1
+    }
+  ],
+  "flows": [
+    {
+      "from": "idp",
+      "to": "eng",
+      "label": "evidence",
+      "type": "data"
+    },
+    {
+      "from": "sec",
+      "to": "eng",
+      "label": "evidence",
+      "type": "data"
+    },
+    {
+      "from": "bkp",
+      "to": "eng",
+      "label": "evidence",
+      "type": "data"
+    },
+    {
+      "from": "lib",
+      "to": "eng",
+      "label": "controls + crosswalk",
+      "type": "data"
+    },
+    {
+      "from": "eng",
+      "to": "out",
+      "label": "readiness per framework",
+      "type": "data"
+    },
+    {
+      "from": "out",
+      "to": "risk",
+      "label": "exceptions",
+      "type": "data"
+    }
+  ],
+  "boundaries": []
+}
